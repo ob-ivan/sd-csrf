@@ -1,0 +1,19 @@
+{
+    "name": "ob-ivan/sd-csrf",
+    "autoload": {
+        "psr-4": {
+            "SD\\Csrf\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.2"
+    },
+    "require": {
+        "ob-ivan/sd-dependency-injection": "^1.2.2"
+    }
+}
