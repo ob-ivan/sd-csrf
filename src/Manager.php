@@ -1,12 +1,16 @@
 <?php
 namespace SD\Csrf;
 
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class Manager {
     const TOKEN_TTL_MINUTES = 60;
     const TOKEN_MAX_REUSE   = 5;
 
-    public function __construct() {
-        session_start();
+    private $session;
+
+    public function __construct(Session $session) {
+        $this->session = $session;
     }
 
     public function verify(string $name, string $value): bool {
@@ -15,28 +19,28 @@ class Manager {
         $reuseLeft = $token->getReuseLeft() - 1;
         $key = $this->key($name);
         if ($reuseLeft < 1) {
-            unset($_SESSION[$key]);
+            $this->session->remove($key);
         } else {
-            $_SESSION[$key] = $token->decrement();
+            $this->session->set($key, $token->decrement());
         }
         return $result;
     }
 
     public function get(string $name): Token {
         $key = $this->key($name);
-        if (isset($_SESSION[$key])) {
-            $token = $_SESSION[$key];
+        if ($this->session->has($key)) {
+            $token = $this->session->get($key);
             if (!$token instanceof Token ||
                 $token->getName() !== $name ||
                 $token->getExpireUnix() < time()
             ) {
-                unset($_SESSION[$key]);
+                $this->session->remove($key);
             }
         }
-        if (!isset($_SESSION[$key])) {
-            $_SESSION[$key] = $this->token($name);
+        if (!$this->session->has($key)) {
+            $this->session->set($key, $this->token($name));
         }
-        return $_SESSION[$key];
+        return $this->session->get($key);
     }
 
     private function key(string $name): string {
