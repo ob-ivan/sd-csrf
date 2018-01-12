@@ -15,6 +15,6 @@
     },
     "require": {
         "ob-ivan/sd-dependency-injection": "^1.2.2",
-        "symfony/http-foundation": "^3.3"
+        "symfony/http-foundation": "^3.3 || ^4.0"
     }
 }
